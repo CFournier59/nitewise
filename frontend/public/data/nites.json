@@ -1,0 +1,152 @@
+[
+  {
+    "id": "01",
+    "userId": "abc123",
+    "title": "Nuit #00001",
+    "bedTime": {
+      "day": "2024-06-01",
+      "hour": "22:30"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-02",
+      "hour": "07:00"
+    },
+    "quality": 4,
+    "notes": "Je me suis endormi rapidement, mais je me suis réveillé"
+  },
+  {
+    "id": "02",
+    "userId": "abc123",
+    "title": "Nuit #00002",
+    "bedTime": {
+      "day": "2024-06-02",
+      "hour": "23:00"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-03",
+      "hour": "07:30"
+    },
+    "quality": 3,
+    "notes": "J'ai eu du mal à m'endormir, mais j'ai dormi profondément une fois endormi."
+  },
+  {
+    "id": "03",
+    "userId": "abc123",
+    "title": "Nuit #00003",
+    "bedTime": {
+      "day": "2024-06-03",
+      "hour": "22:45"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-04",
+      "hour": "06:45"
+    },
+    "quality": 5,
+    "notes": "J'ai dormi comme un bébé, sans me réveiller une seule fois."
+  },
+  {
+    "id": "04",
+    "userId": "abc123",
+    "title": "Nuit #00004",
+    "bedTime": {
+      "day": "2024-06-04",
+      "hour": "23:15"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-05",
+      "hour": "07:00"
+    },
+    "quality": 2,
+    "notes": "J'ai eu du mal à m'endormir et je me suis réveillé plusieurs fois pendant la nuit."
+  },
+  {
+    "id": "05",
+    "userId": "abc123",
+    "title": "Nuit #00005",
+    "bedTime": {
+      "day": "2024-06-05",
+      "hour": "22:30"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-06",
+      "hour": "07:30"
+    },
+    "quality": 4,
+    "notes": "J'ai dormi profondément, mais je me suis réveillé une fois pour aller aux toilettes."
+  },
+  {
+    "id": "06",
+    "userId": "abc123",
+    "title": "Nuit #00006",
+    "bedTime": {
+      "day": "2024-06-06",
+      "hour": "23:00"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-07",
+      "hour": "07:00"
+    },
+    "quality": 3,
+    "notes": "J'ai eu du mal à m'endormir, mais j'ai dormi profondément une fois endormi."
+  },
+  {
+    "id": "07",
+    "userId": "abc123",
+    "title": "Nuit #00007",
+    "bedTime": {
+      "day": "2024-06-07",
+      "hour": "22:45"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-08",
+      "hour": "06:45"
+    },
+    "quality": 5,
+    "notes": "J'ai dormi comme un bébé, sans me réveiller une seule fois."
+  },
+  {
+    "id": "08",
+    "userId": "abc123",
+    "title": "Nuit #00008",
+    "bedTime": {
+      "day": "2024-06-08",
+      "hour": "23:15"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-09",
+      "hour": "07:00"
+    },
+    "quality": 2,
+    "notes": "J'ai eu du mal à m'endormir et je me suis réveillé plusieurs fois pendant la nuit."
+  },
+  {
+    "id": "09",
+    "userId": "abc123",
+    "title": "Nuit #00009",
+    "bedTime": {
+      "day": "2024-06-09",
+      "hour": "22:30"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-10",
+      "hour": "07:30"
+    },
+    "quality": 4,
+    "notes": "J'ai dormi profondément, mais je me suis réveillé une fois pour aller aux toilettes."
+  },
+  {
+    "id": "10",
+    "userId": "abc123",
+    "title": "Nuit #00010",
+    "bedTime": {
+      "day": "2024-06-10",
+      "hour": "23:00"
+    },
+    "wakeUpTime": {
+      "day": "2024-06-11",
+      "hour": "07:00"
+    },
+    "quality": 3,
+    "notes": "J'ai eu du mal à m'endormir, mais j'ai dormi profondément une fois endormi."
+  }
+]
