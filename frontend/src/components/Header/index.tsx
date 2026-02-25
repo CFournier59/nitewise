@@ -19,7 +19,7 @@ export default function Header() {
       </p>
       <Link
         to="/settings"
-        className="flex items-center gap-1 shadow-lg rounded-full p-1 bg-col1 border-2 border-col2"
+        className="flex items-center gap-1 shadow-lg rounded-full p-1 bg-col1 border-2 border-col2 active:translate-y-2 active:shadow-none"
       >
         <Settings size={28} />
       </Link>
