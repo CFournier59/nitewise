@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { HashRouter, Routes, Route } from 'react-router'
 import './styles/tailwind.css'
 import './styles/global.css'
+import type { Nite } from './types'
 import Home from './pages/Home'
 import Settings from './pages/Settings'
 
@@ -12,7 +13,7 @@ async function init() {
   return JSON.parse(text)
 }
 
-const nites = await init()
+const nites: Nite[] = await init()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
