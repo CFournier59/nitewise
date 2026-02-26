@@ -5,6 +5,7 @@ import './styles/tailwind.css'
 import './styles/global.css'
 import type { Nite } from './types'
 import Home from './pages/Home'
+import Show from './pages/Show'
 import Settings from './pages/Settings'
 
 async function init() {
@@ -24,7 +25,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/login" element={<div>Login</div>} />
         <Route path="/register" element={<div>Register</div>} />
         <Route path="/stats" element={<div>Stats</div>} />
-        <Route path="/nites" element={<div>Nites</div>} />
+        <Route path="/nites" element={<Show nites={nites} />} />
         <Route path="/nites/create" element={<div>Create Nite</div>} />
         <Route path="/nites/:niteId" element={<div>Edit Nite</div>} />
         <Route path="/*" element={<div>Not found</div>} />
