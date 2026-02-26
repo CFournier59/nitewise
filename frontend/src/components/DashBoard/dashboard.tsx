@@ -21,6 +21,11 @@ export default function DashBoard({ nites }: { nites: Nite[] }) {
   const bedTimeBoundary = d.toISOString()
   const lastNite = nites.find((nite) => nite.bedTime > bedTimeBoundary)
 
+  const lnDuration = lastNite
+    ? new Date(lastNite.wakeUpTime).getTime() -
+      new Date(lastNite.bedTime).getTime()
+    : 0
+
   return (
     <main>
       <div>
@@ -44,8 +49,14 @@ export default function DashBoard({ nites }: { nites: Nite[] }) {
           </div>
         )}
       </div>
-      <Table lastNite={lastNite} />
-      {lastNite && <CompareTable nites={nites} lastNite={lastNite} />}
+      <Table lastNite={lastNite} lnDuration={lnDuration} />
+      {lastNite && (
+        <CompareTable
+          nites={nites}
+          lastNite={lastNite}
+          lnDuration={lnDuration}
+        />
+      )}
     </main>
   )
 }
