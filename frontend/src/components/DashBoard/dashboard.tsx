@@ -1,6 +1,6 @@
 import type { Nite } from '../../types'
-import recorded from '../../assets/recorded.svg'
-import unrecorded from '../../assets/unrecorded.svg'
+import recordedIcon from '../../assets/recorded-icon.svg'
+import unrecordedIcon from '../../assets/unrecorded-icon.svg'
 import CompareTable from './compareTable'
 import Table from './table'
 import { Link } from 'react-router'
@@ -34,12 +34,12 @@ export default function DashBoard({ nites }: { nites: Nite[] }) {
         </p>
         {lastNite ? (
           <div className="flex items-center gap-5 mt-4">
-            <img src={recorded} alt="nuit enregistrée" />
+            <img src={recordedIcon} alt="nuit enregistrée" />
             <p className="text-sm font-bold">nuit enregistrée !</p>
           </div>
         ) : (
           <div className="flex items-center justify-between mt-4">
-            <img src={unrecorded} alt="nuit non enregistrée" />
+            <img src={unrecordedIcon} alt="nuit non enregistrée" />
             <Link
               to={'nites/create'}
               className="text-2xl font-bold bg-col1 border-2 border-col2 rounded-lg p-3 shadow-lg active:translate-y-2 active:shadow-none"
