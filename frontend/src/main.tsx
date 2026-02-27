@@ -6,6 +6,7 @@ import './styles/global.css'
 import type { Nite } from './types'
 import Home from './pages/Home'
 import Show from './pages/Show'
+import Create from './pages/Create'
 import Settings from './pages/Settings'
 
 async function init() {
@@ -26,7 +27,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/register" element={<div>Register</div>} />
         <Route path="/stats" element={<div>Stats</div>} />
         <Route path="/nites" element={<Show nites={nites} />} />
-        <Route path="/nites/create" element={<div>Create Nite</div>} />
+        <Route path="/nites/create" element={<Create nites={nites} />} />
         <Route path="/nites/:niteId" element={<div>Edit Nite</div>} />
         <Route path="/*" element={<div>Not found</div>} />
       </Routes>
