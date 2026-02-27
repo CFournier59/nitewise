@@ -4,6 +4,7 @@ import unrecordedIcon from '../../assets/unrecorded-icon.svg'
 import CompareTable from './compareTable'
 import Table from './table'
 import { Link } from 'react-router'
+import { checkForNite } from '../../utils'
 
 export default function DashBoard({ nites }: { nites: Nite[] }) {
   const nitePrompt = [
@@ -15,11 +16,15 @@ export default function DashBoard({ nites }: { nites: Nite[] }) {
     "Bravo ! Tu as passé une excellente nuit. Continue comme ça pour rester en forme et plein d'énergie !",
   ]
   // on cherche la dernière nuit qui a commencé après 17h hier
-  const d = new Date()
-  d.setDate(d.getDate() - 1)
-  d.setHours(17, 0, 0, 0)
-  const bedTimeBoundary = d.toISOString()
-  const lastNite = nites.find((nite) => nite.bedTime > bedTimeBoundary)
+  const today = new Date()
+  // console.log(d)
+  // d.setDate(d.getDate() - 1)
+  // console.log(d)
+  // d.setHours(17, 0, 0, 0)
+  // console.log(d)
+  // const bedTimeBoundary = d.toISOString()
+  // console.log(bedTimeBoundary)
+  const lastNite = checkForNite(today.toISOString(), nites)
 
   const lnDuration = lastNite
     ? new Date(lastNite.wakeUpTime).getTime() -

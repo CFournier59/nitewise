@@ -7,6 +7,7 @@ import {
   unComputeDayTransition,
   computeTimeDiff,
   computeDurationDiff,
+  checkForNite,
 } from '../../utils'
 
 export default function CompareTable({
@@ -19,14 +20,11 @@ export default function CompareTable({
   lnDuration: number
 }) {
   // creating a potental night before last night
-  const d = new Date()
-  d.setDate(d.getDate() - 2)
-  d.setHours(17, 0, 0, 0)
-  const bedTimeBoundary = d.toISOString()
+  const date = new Date()
+  date.setDate(date.getDate() - 1)
+  const yesterday = date.toISOString()
   if (!lastNite) return null
-  const niteBefore: Nite | undefined = nites.find(
-    (nite) => nite.bedTime > bedTimeBoundary && nite.bedTime < lastNite.bedTime
-  )
+  const niteBefore: Nite | undefined = checkForNite(yesterday, nites)
 
   const nbDuration = niteBefore
     ? new Date(niteBefore.wakeUpTime).getTime() -
