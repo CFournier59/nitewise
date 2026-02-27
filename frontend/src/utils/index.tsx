@@ -1,3 +1,5 @@
+import type { Nite } from '../types'
+
 export function hoursOf(value: number) {
   const hours = Math.floor(value / 3600000)
   return hours
@@ -60,4 +62,18 @@ export function computeDurationDiff(duration1: number, duration2: number) {
     : diff < 0
       ? `${hoursOf(-diff)}h${minutesOf(-diff).toString().padStart(2, '0')}min de moins`
       : `${hoursOf(diff)}h${minutesOf(diff).toString().padStart(2, '0')}min de plus`
+}
+
+export function checkForNite(date: string, nites: Nite[]) {
+  const lowDate = new Date(date)
+  lowDate.setDate(lowDate.getDate() - 1)
+  lowDate.setHours(17, 0, 0, 0)
+  const lowBoundary = lowDate.toISOString()
+  const highDate = new Date(date)
+  highDate.setHours(16, 59, 59, 999)
+  const highBoundary = highDate.toISOString()
+
+  return nites.find(
+    (nite) => nite.bedTime >= lowBoundary && nite.bedTime <= highBoundary
+  )
 }
