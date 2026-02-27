@@ -158,7 +158,7 @@ export default function CompareTable({
             <td className="text-center pb-2">
               {(() => {
                 const diff = lastNite.quality - qualityToCompare
-                return diff === 0 ? 'pareil' : diff
+                return diff === 0 ? 'pareil' : diff > 0 ? '+' + diff : diff
               })()}
             </td>
           </tr>
