@@ -6,3 +6,8 @@ export type Nite = {
   quality: number
   notes: string
 }
+
+export type FormData = {
+  time: string
+  date: string
+}
