@@ -4,6 +4,8 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CustomInput from '../../components/CustomInput'
 import type { Nite, FormData } from '../../types'
+const modules = import.meta.glob('/src/assets/score*.svg', { eager: true })
+const scoreImages = Object.values(modules).map((m: any) => m.default)
 
 export default function NiteForm({ nites }: { nites: Nite[] }) {
   // valeurs par défaut de la date de coucher
@@ -18,7 +20,7 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
     title: '',
     bedTime: yesterday.toLocaleString('sv-SE'),
     wakeUpTime: '',
-    quality: 0,
+    quality: 3,
     notes: '',
   })
 
@@ -167,17 +169,14 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
   ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      quality: Number(e.target.value),
     })
   }
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6 mt-6">
       <Carousel>
-        <section className="w-full">
-          <label htmlFor="name" className="text-xl">
-            Date du couché
-          </label>
+        <fieldset className="w-full">
+          <legend className="text-xl">Date du couché</legend>
           <div className="flex flex-col gap-6 items-center mt-10">
             <DatePicker
               selected={bedDay}
@@ -217,11 +216,9 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
             />
           </div>
-        </section>
-        <section className="w-full">
-          <label htmlFor="name" className="text-xl">
-            Date du réveil
-          </label>
+        </fieldset>
+        <fieldset className="w-full">
+          <legend className="text-xl">Date du réveil</legend>
           <div className="flex flex-col gap-6 items-center mt-10">
             <DatePicker
               selected={wakeUpDay}
@@ -264,13 +261,133 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
             />
           </div>
-        </section>
-        <section className="w-full">
-          <div>note</div>
-        </section>
-        <section className="w-full">
+        </fieldset>
+        <fieldset className="w-full">
+          <legend className="text-xl">Bien Dormi ?</legend>
+          <div className="flex justify-between">
+            <div
+              className={`active:translate-y-2 ${formData.quality !== 1 ? 'opacity-40' : ''}`}
+            >
+              <input
+                type="radio"
+                id="score1"
+                name="score"
+                value={1}
+                onChange={handleChange}
+                checked={formData.quality === 1}
+                className="relative h-10 w-10 z-20 opacity-0"
+              />
+              <br />
+              <img
+                src={scoreImages[0]}
+                alt="score"
+                className="relative bottom-12 right-1 z-10  "
+              />
+
+              <label htmlFor="score1" className="text-xs relative bottom-12">
+                nooon!
+              </label>
+            </div>
+            <div
+              className={`active:translate-y-2 ${formData.quality !== 2 ? 'opacity-40' : ''}`}
+            >
+              <input
+                type="radio"
+                id="score2"
+                name="score"
+                value={2}
+                onChange={handleChange}
+                checked={formData.quality === 2}
+                className="relative h-10 w-10 z-20 opacity-0"
+              />
+              <br />
+              <img
+                src={scoreImages[1]}
+                alt="score"
+                className="relative bottom-12 right-1 z-10  "
+              />
+
+              <label htmlFor="score2" className="text-xs relative bottom-12">
+                pas ouf
+              </label>
+            </div>
+
+            <div
+              className={`active:translate-y-2 ${formData.quality !== 3 ? 'opacity-40' : ''}`}
+            >
+              <input
+                type="radio"
+                id="score3"
+                name="score"
+                value={3}
+                onChange={handleChange}
+                checked={formData.quality === 3}
+                className="relative h-10 w-10 z-20 opacity-0"
+              />
+              <br />
+              <img
+                src={scoreImages[2]}
+                alt="score"
+                className="relative bottom-12 right-1 z-10  "
+              />
+
+              <label htmlFor="score3" className="text-xs relative bottom-12">
+                bof
+              </label>
+            </div>
+
+            <div
+              className={`active:translate-y-2 ${formData.quality !== 4 ? 'opacity-40' : ''}`}
+            >
+              <input
+                type="radio"
+                id="score4"
+                name="score"
+                value={4}
+                onChange={handleChange}
+                checked={formData.quality === 4}
+                className="relative h-10 w-10 z-20 opacity-0"
+              />
+              <br />
+              <img
+                src={scoreImages[3]}
+                alt="score"
+                className="relative bottom-12 right-1 z-10  "
+              />
+
+              <label htmlFor="score4" className="text-xs relative bottom-12">
+                ça va
+              </label>
+            </div>
+
+            <div
+              className={`active:translate-y-2 ${formData.quality !== 5 ? 'opacity-40' : ''}`}
+            >
+              <input
+                type="radio"
+                id="score5"
+                name="score"
+                value={5}
+                onChange={handleChange}
+                checked={formData.quality === 5}
+                className="relative h-10 w-10 z-20 opacity-0"
+              />
+              <br />
+              <img
+                src={scoreImages[4]}
+                alt="score"
+                className="relative bottom-12 right-1 z-10   "
+              />
+
+              <label className="text-xs relative bottom-12" htmlFor="score5">
+                au top!
+              </label>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset className="w-full">
           <div>commentaire</div>
-        </section>
+        </fieldset>
       </Carousel>
     </form>
   )
