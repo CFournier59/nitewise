@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import Carousel from '../../components/Carousel'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import CustomInput from '../../components/CustomInput'
@@ -175,17 +176,6 @@ export default function Create({ nites }: { nites: Nite[] }) {
     })
   }
 
-  // --- Carousel state + handlers ---
-  const [index, setIndex] = useState(0)
-
-  const next = () => {
-    setIndex((prev) => (prev === 1 ? 0 : prev + 1))
-  }
-
-  const prev = () => {
-    setIndex((prev) => (prev === 0 ? 1 : prev - 1))
-  }
-
   return (
     <>
       <div>
@@ -196,133 +186,99 @@ export default function Create({ nites }: { nites: Nite[] }) {
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-6">
-            {/* Carousel */}
-            <div
-              style={{
-                width: '300px',
-                overflow: 'hidden',
-                position: 'relative',
-                marginTop: '2rem',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  width: '600px',
-                  transform: `translateX(-${index * 300}px)`,
-                  transition: 'transform 0.4s ease',
-                }}
-              >
-                <div className="w-full">
-                  <label htmlFor="name" className="text-xl">
-                    Date du couché
-                  </label>
-                  <div className="flex flex-col gap-6 items-center mt-10">
-                    <DatePicker
-                      selected={bedDay}
-                      maxDate={new Date()}
-                      onChange={(d: Date | null) => {
-                        setBedDay(d)
-                        setFormData({
-                          ...formData,
-                          bedTime: mergeDateAndTime(d, bedHour),
-                        })
-                      }}
-                      dateFormat="dd/MM/yyyy"
-                      className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
-                      calendarClassName=""
-                      customInput={<CustomInput type="date" />}
-                      name="date"
-                    />
-                    à
-                    <DatePicker
-                      selected={bedHour}
-                      onChange={(d: Date | null) => {
-                        setBedHour(d)
-                        setFormData({
-                          ...formData,
-                          bedTime: mergeDateAndTime(bedDay, d),
-                        })
-                      }}
-                      showTimeSelect
-                      showTimeSelectOnly
-                      timeIntervals={15}
-                      timeCaption="Heure"
-                      timeFormat="HH:mm"
-                      dateFormat="HH:mm"
-                      minTime={minBedHour}
-                      maxTime={maxBedHour}
-                      customInput={<CustomInput type="time" />}
-                      className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
-                    />
-                  </div>
-                </div>
-
-                <div className="w-full">
-                  <label htmlFor="name" className="text-xl">
-                    Date du réveil
-                  </label>
-                  <div className="flex flex-col gap-6 items-center mt-10">
-                    <DatePicker
-                      selected={wakeUpDay}
-                      minDate={minWakeUpDay}
-                      maxDate={maxWakeUpDay}
-                      onChange={(d: Date | null) => {
-                        if (!d) return
-                        setWakeUpDay(d)
-                        setFormData({
-                          ...formData,
-                          wakeUpTime: mergeDateAndTime(d, wakeUpHour),
-                        })
-                        toggleWakeUpHourBoundaries(d)
-                      }}
-                      dateFormat="dd/MM/yyyy"
-                      className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
-                      calendarClassName="ml-50"
-                      customInput={<CustomInput type="date" />}
-                      name="date"
-                    />
-                    à
-                    <DatePicker
-                      selected={wakeUpHour}
-                      onChange={(d: Date | null) => {
-                        setWakeUpHour(d)
-                        setFormData({
-                          ...formData,
-                          wakeUpTime: mergeDateAndTime(wakeUpDay, d),
-                        })
-                      }}
-                      showTimeSelect
-                      showTimeSelectOnly
-                      minTime={minWakeUpHour}
-                      maxTime={maxWakeUpHour}
-                      timeIntervals={15}
-                      timeCaption="Heure"
-                      timeFormat="HH:mm"
-                      dateFormat="HH:mm"
-                      customInput={<CustomInput type="time" />}
-                      className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
-                    />
-                  </div>
+            <Carousel>
+              <div className="w-full">
+                <label htmlFor="name" className="text-xl">
+                  Date du couché
+                </label>
+                <div className="flex flex-col gap-6 items-center mt-10">
+                  <DatePicker
+                    selected={bedDay}
+                    maxDate={new Date()}
+                    onChange={(d: Date | null) => {
+                      setBedDay(d)
+                      setFormData({
+                        ...formData,
+                        bedTime: mergeDateAndTime(d, bedHour),
+                      })
+                    }}
+                    dateFormat="dd/MM/yyyy"
+                    className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
+                    calendarClassName=""
+                    customInput={<CustomInput type="date" />}
+                    name="date"
+                  />
+                  à
+                  <DatePicker
+                    selected={bedHour}
+                    onChange={(d: Date | null) => {
+                      setBedHour(d)
+                      setFormData({
+                        ...formData,
+                        bedTime: mergeDateAndTime(bedDay, d),
+                      })
+                    }}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Heure"
+                    timeFormat="HH:mm"
+                    dateFormat="HH:mm"
+                    minTime={minBedHour}
+                    maxTime={maxBedHour}
+                    customInput={<CustomInput type="time" />}
+                    className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
+                  />
                 </div>
               </div>
-
-              <div
-                style={{
-                  marginTop: '10px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <button type="button" onClick={prev}>
-                  Previous
-                </button>
-                <button type="button" onClick={next}>
-                  Next
-                </button>
+              <div className="w-full">
+                <label htmlFor="name" className="text-xl">
+                  Date du réveil
+                </label>
+                <div className="flex flex-col gap-6 items-center mt-10">
+                  <DatePicker
+                    selected={wakeUpDay}
+                    minDate={minWakeUpDay}
+                    maxDate={maxWakeUpDay}
+                    onChange={(d: Date | null) => {
+                      if (!d) return
+                      setWakeUpDay(d)
+                      setFormData({
+                        ...formData,
+                        wakeUpTime: mergeDateAndTime(d, wakeUpHour),
+                      })
+                      toggleWakeUpHourBoundaries(d)
+                    }}
+                    dateFormat="dd/MM/yyyy"
+                    className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
+                    calendarClassName="ml-50"
+                    customInput={<CustomInput type="date" />}
+                    name="date"
+                  />
+                  à
+                  <DatePicker
+                    selected={wakeUpHour}
+                    onChange={(d: Date | null) => {
+                      setWakeUpHour(d)
+                      setFormData({
+                        ...formData,
+                        wakeUpTime: mergeDateAndTime(wakeUpDay, d),
+                      })
+                    }}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    minTime={minWakeUpHour}
+                    maxTime={maxWakeUpHour}
+                    timeIntervals={15}
+                    timeCaption="Heure"
+                    timeFormat="HH:mm"
+                    dateFormat="HH:mm"
+                    customInput={<CustomInput type="time" />}
+                    className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
+                  />
+                </div>
               </div>
-            </div>
-
+            </Carousel>
             <button
               type="submit"
               className="w-full px-8 py-3 bg-base-color text-white rounded-lg hover:bg-base-hover-color transition-colors cursor-pointer mt-6"
