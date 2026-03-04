@@ -18,7 +18,7 @@ export default function Carousel({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        width: '300px',
+        width: '100%',
         overflow: 'hidden',
         position: 'relative',
         marginTop: '2rem',
@@ -27,8 +27,8 @@ export default function Carousel({ children }: { children: React.ReactNode }) {
       <div
         style={{
           display: 'flex',
-          width: `${count * 300}px`,
-          transform: `translateX(-${index * 300}px)`,
+          width: `${100 * count}%`,
+          transform: `translateX(-${(index * 100) / count}%)`,
           transition: 'transform 0.4s ease',
         }}
       >

@@ -264,7 +264,7 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
         </fieldset>
         <fieldset className="w-full">
           <legend className="text-xl">Bien Dormi ?</legend>
-          <div className="flex justify-between">
+          <div className="flex justify-between mt-20">
             <div
               className={`active:translate-y-2 ${formData.quality !== 1 ? 'opacity-40' : ''}`}
             >
@@ -386,7 +386,22 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
           </div>
         </fieldset>
         <fieldset className="w-full">
-          <div>commentaire</div>
+          <legend className="text-xl">Commentaire et validation</legend>
+          <input
+            type="text"
+            className="bg-col1 w-full border-2 border-col2 rounded-lg p-2 mt-10 active:translate-y-2"
+            placeholder="commentaire facultatif..."
+            maxLength={150}
+          />
+          <div className="mx-auto mt-10 w-fit">
+            <button
+              type="submit"
+              className=" text-2xl font-bold bg-col1 border-2 border-col2 rounded-lg p-3 shadow-lg active:translate-y-2 active:shadow-none"
+              onSubmit={handleSubmit}
+            >
+              ENREGISTRER
+            </button>
+          </div>
         </fieldset>
       </Carousel>
     </form>
