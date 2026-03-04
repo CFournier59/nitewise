@@ -187,7 +187,7 @@ export default function Create({ nites }: { nites: Nite[] }) {
 
           <form onSubmit={handleSubmit} className="space-y-6 mt-6">
             <Carousel>
-              <div className="w-full">
+              <section className="w-full">
                 <label htmlFor="name" className="text-xl">
                   Date du couché
                 </label>
@@ -230,8 +230,8 @@ export default function Create({ nites }: { nites: Nite[] }) {
                     className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
                   />
                 </div>
-              </div>
-              <div className="w-full">
+              </section>
+              <section className="w-full">
                 <label htmlFor="name" className="text-xl">
                   Date du réveil
                 </label>
@@ -277,14 +277,14 @@ export default function Create({ nites }: { nites: Nite[] }) {
                     className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
                   />
                 </div>
-              </div>
+              </section>
+              <section className="w-full">
+                <div>note</div>
+              </section>
+              <section className="w-full">
+                <div>commentaire</div>
+              </section>
             </Carousel>
-            <button
-              type="submit"
-              className="w-full px-8 py-3 bg-base-color text-white rounded-lg hover:bg-base-hover-color transition-colors cursor-pointer mt-6"
-            >
-              Envoyer
-            </button>
           </form>
         </main>
       </div>

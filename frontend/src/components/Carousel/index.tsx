@@ -26,7 +26,7 @@ export default function Carousel({ children }: { children: React.ReactNode }) {
       <div
         style={{
           display: 'flex',
-          width: '600px',
+          width: `${count * 300}px`,
           transform: `translateX(-${index * 300}px)`,
           transition: 'transform 0.4s ease',
         }}
@@ -34,19 +34,21 @@ export default function Carousel({ children }: { children: React.ReactNode }) {
         {children}
       </div>
 
-      <div
-        style={{
-          marginTop: '10px',
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        <button type="button" onClick={prev}>
-          Previous
-        </button>
-        <button type="button" onClick={next}>
-          Next
-        </button>
+      <div className="flex justify-between mt-10">
+        {index === 0 ? (
+          <div aria-hidden="true"></div>
+        ) : (
+          <button type="button" onClick={prev}>
+            Previous
+          </button>
+        )}
+        {index === count - 1 ? (
+          <div aria-hidden="true"></div>
+        ) : (
+          <button type="button" onClick={next}>
+            Next
+          </button>
+        )}
       </div>
     </div>
   )
