@@ -3,287 +3,192 @@ import Carousel from '../../components/Carousel'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CustomInput from '../../components/CustomInput'
-import type { Nite, FormData, TimeField } from '../../types'
+import type { Nite, FormData } from '../../types'
 const modules = import.meta.glob('/src/assets/score*.svg', { eager: true })
 const scoreImages = Object.values(modules).map((m: any) => m.default)
 import { checkForNite } from '../../utils'
 
 export default function NiteForm({ nites }: { nites: Nite[] }) {
-  // valeurs par défaut de la date de coucher
+  // --- valeurs par défaut ---
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
   yesterday.setHours(22)
   yesterday.setMinutes(0)
-  const [bedDay, setBedDay] = useState<Date | null>(yesterday)
-  const [bedHour, setBedHour] = useState<Date | null>(new Date(0, 0, 0, 22, 0))
 
-  // valeur par défaut de la date de réveil
-  const [wakeUpDay, setWakeUpDay] = useState<Date | null>(new Date())
-  const [minWakeUpDay, setMinWakeUpDay] = useState<Date | undefined>(yesterday)
-  const [maxWakeUpDay, setMaxWakeUpDay] = useState<Date | undefined>(new Date())
+  const today = new Date()
 
-  const [wakeUpHour, setWakeUpHour] = useState<Date | null>(
-    new Date(0, 0, 0, 7, 0)
-  )
-  const [minWakeUpHour, setMinWakeUpHour] = useState<Date | undefined>(
+  // --- states atomiques ---
+  const [bedDay, setBedDay] = useState<Date>(yesterday)
+  const [bedHour, setBedHour] = useState<Date>(new Date(0, 0, 0, 22, 0))
+
+  const [wakeUpDay, setWakeUpDay] = useState<Date>(today)
+  const [wakeUpHour, setWakeUpHour] = useState<Date>(new Date(0, 0, 0, 7, 0))
+
+  const [minWakeUpDay, setMinWakeUpDay] = useState<Date>(yesterday)
+  const [maxWakeUpDay, setMaxWakeUpDay] = useState<Date>(today)
+
+  const [minWakeUpHour, setMinWakeUpHour] = useState<Date>(
     new Date(0, 0, 0, 0, 0)
   )
-  const [maxWakeUpHour, setMaxWakeUpHour] = useState<Date | undefined>(
+  const [maxWakeUpHour, setMaxWakeUpHour] = useState<Date>(
     new Date(0, 0, 0, 16, 45)
   )
 
-  const initialWakeUpTime = new Date()
-  initialWakeUpTime.setHours(7)
-  initialWakeUpTime.setMinutes(0)
+  const [quality, setQuality] = useState<number>(3)
+  const [notes, setNotes] = useState<string>('')
 
-  // valeur par défaut du Formulaire
-  const [formData, setFormData] = useState<FormData>({
-    id: '',
-    title: '',
-    bedTime: yesterday.toLocaleString('sv-SE'),
-    wakeUpTime: initialWakeUpTime.toLocaleString('sv-SE'),
-    quality: 3,
-    notes: '',
-  })
+  const firstRender = useRef(true)
 
+  // --- helpers ---
   const isSameDay = (d1: Date, d2: Date) =>
     d1.toLocaleString('sv-SE').slice(0, 10) ===
     d2.toLocaleString('sv-SE').slice(0, 10)
 
-  // calcul des limites d'heures de coucher
-  const isBedDayToday = isSameDay(new Date(formData.bedTime), new Date())
-  const minBedHour = new Date(0, 0, 0, 0, 0)
-  const maxBedHour = isBedDayToday
-    ? new Date(0, 0, 0, 16, 45)
-    : new Date(0, 0, 0, 23, 45)
+  function mergeDateAndTime(date: Date, time: Date): string {
+    const merged = new Date(date)
+    merged.setHours(time.getHours())
+    merged.setMinutes(time.getMinutes())
+    return merged.toLocaleString('sv-SE')
+  }
 
-  //ignorer le useEffect lors du premier rendu
-  const firstRender = useRef(true)
-
-  //changement des limites en fonction de la date de coucher
+  // --- recalcul automatique des limites ---
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false
       return
     }
 
-    // mise à 00 des heures auto si on passe bedDay à aujourd'hui
-    if (
-      isSameDay(new Date(formData.bedTime), new Date()) &&
-      bedHour!.getHours() > 16
-    ) {
-      const newBedHour = new Date(0, 0, 0, 0, 0)
-      setBedHour(newBedHour)
-      setFormData((prev) => ({
-        ...prev,
-        bedTime: mergeDateAndTime(bedDay, newBedHour),
-      }))
+    const bedIsToday = isSameDay(bedDay, today)
+
+    // 1) Si coucher aujourd’hui et heure > 16 → forcer 00:00
+    if (bedIsToday && bedHour.getHours() > 16) {
+      const newHour = new Date(0, 0, 0, 0, 0)
+      setBedHour(newHour)
       return
     }
-    // si coucher et levé à aujourd'hui
-    if (isSameDay(new Date(formData.bedTime), new Date())) {
-      const newWakeUpDay = new Date()
+
+    // 2) Si coucher aujourd’hui → réveil aujourd’hui
+    if (bedIsToday) {
+      const newWakeUpDay = today
       setWakeUpDay(newWakeUpDay)
-      setFormData((prev) => ({
-        ...prev,
-        wakeUpTime: mergeDateAndTime(newWakeUpDay, wakeUpHour),
-      }))
-      setMinWakeUpDay(new Date())
-      setMaxWakeUpDay(new Date())
+
       const newWakeUpHour = new Date(
         0,
         0,
         0,
-        bedHour!.getHours(),
-        bedHour!.getMinutes() + 15
+        bedHour.getHours(),
+        bedHour.getMinutes() + 15
       )
       setWakeUpHour(newWakeUpHour)
-      setFormData((prev) => ({
-        ...prev,
-        wakeUpTime: mergeDateAndTime(wakeUpDay, newWakeUpHour),
-      }))
-      setMinWakeUpHour(
-        new Date(0, 0, 0, bedHour!.getHours(), bedHour!.getMinutes() + 15)
-      )
+
+      setMinWakeUpDay(today)
+      setMaxWakeUpDay(today)
+
+      setMinWakeUpHour(newWakeUpHour)
       setMaxWakeUpHour(new Date(0, 0, 0, 16, 45))
       return
     }
-    // si jour du couché différent du jour de levé et que :  heure du couché < 17
-    if (bedHour!.getHours() < 17) {
-      const newWakeUpDay2 = new Date(formData.bedTime)
-      setWakeUpDay(newWakeUpDay2)
-      setFormData((prev) => ({
-        ...prev,
-        wakeUpTime: mergeDateAndTime(newWakeUpDay2, wakeUpHour),
-      }))
 
-      setMinWakeUpDay(new Date(formData.bedTime))
-      setMaxWakeUpDay(new Date(formData.bedTime))
-      const newWakeUpHour2 = new Date(
-        0,
-        0,
-        0,
-        bedHour!.getHours(),
-        bedHour!.getMinutes() + 15
-      )
-      setWakeUpHour(newWakeUpHour2)
-      setFormData((prev) => ({
-        ...prev,
-        wakeUpTime: mergeDateAndTime(wakeUpDay, newWakeUpHour2),
-      }))
+    // 3) Si coucher avant 17h → réveil même jour
+    if (bedHour.getHours() < 17) {
+      const newWakeUpDay = new Date(bedDay)
+      setWakeUpDay(newWakeUpDay)
 
-      setMinWakeUpHour(
-        new Date(0, 0, 0, bedHour!.getHours(), bedHour!.getMinutes() + 15)
+      const newWakeUpHour = new Date(
+        0,
+        0,
+        0,
+        bedHour.getHours(),
+        bedHour.getMinutes() + 15
       )
+      setWakeUpHour(newWakeUpHour)
+
+      setMinWakeUpDay(newWakeUpDay)
+      setMaxWakeUpDay(newWakeUpDay)
+
+      setMinWakeUpHour(newWakeUpHour)
       setMaxWakeUpHour(new Date(0, 0, 0, 16, 45))
-    } else {
-      // si heure du couché > 17
-      const bedDate: Date = new Date(formData.bedTime)
-      const newWakeUpDay3 = new Date(
-        bedDate.getFullYear(),
-        bedDate.getMonth(),
-        bedDate.getDate() + 1,
-        0,
-        0
-      )
-      setWakeUpDay(newWakeUpDay3)
-      setFormData((prev) => ({
-        ...prev,
-        wakeUpTime: mergeDateAndTime(newWakeUpDay3, wakeUpHour),
-      }))
-      setMinWakeUpDay(new Date(formData.bedTime))
-      setMaxWakeUpDay(
-        new Date(
-          bedDate.getFullYear(),
-          bedDate.getMonth(),
-          bedDate.getDate() + 1,
-          0,
-          0
-        )
-      )
-      const newWakeUpHour3 = new Date(0, 0, 0, 7, 0)
-      setWakeUpHour(newWakeUpHour3)
-      setFormData((prev) => ({
-        ...prev,
-        wakeUpTime: mergeDateAndTime(wakeUpDay, newWakeUpHour3),
-      }))
-      setMinWakeUpHour(new Date(0, 0, 0, 0, 0))
-      setMaxWakeUpHour(new Date(0, 0, 0, 16, 45))
+      return
     }
-  }, [formData.bedTime, bedHour])
 
-  //changement des limites d'heure de levé en fonction du jour de levé choisi par l'utilisateur
-  function toggleWakeUpHourBoundaries(d: Date) {
-    if (isSameDay(new Date(formData.bedTime), new Date())) return
-    if (isSameDay(new Date(formData.bedTime), d)) {
-      setWakeUpHour(
-        new Date(0, 0, 0, bedHour!.getHours(), bedHour!.getMinutes() + 15)
-      )
-      setMinWakeUpHour(
-        new Date(0, 0, 0, bedHour!.getHours(), bedHour!.getMinutes() + 15)
-      )
-      setMaxWakeUpHour(new Date(0, 0, 0, 23, 45))
-    } else {
-      setWakeUpHour(new Date(0, 0, 0, 7, 0))
-      setMinWakeUpHour(new Date(0, 0, 0, 0, 0))
-      setMaxWakeUpHour(new Date(0, 0, 0, 16, 45))
-    }
-  }
+    // 4) Si coucher après 17h → réveil lendemain
+    const bedDate = new Date(bedDay)
+    const nextDay = new Date(bedDate)
+    nextDay.setDate(bedDate.getDate() + 1)
 
-  // assemblage des jours et des heures pour constituer les dates de coucher et réveil
-  function mergeDateAndTime(date: Date | null, time: Date | null): string {
-    if (!date) return ''
-    const merged = new Date(date)
-    if (time) {
-      merged.setHours(time.getHours())
-      merged.setMinutes(time.getMinutes())
-    }
-    return merged.toLocaleString('sv-SE')
-  }
+    setWakeUpDay(nextDay)
+    setMinWakeUpDay(bedDate)
+    setMaxWakeUpDay(nextDay)
 
+    const newWakeUpHour = new Date(0, 0, 0, 7, 0)
+    setWakeUpHour(newWakeUpHour)
+
+    setMinWakeUpHour(new Date(0, 0, 0, 0, 0))
+    setMaxWakeUpHour(new Date(0, 0, 0, 16, 45))
+  }, [bedDay, bedHour])
+
+  // --- soumission ---
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log(formData.bedTime)
-    setFormData({
-      ...formData,
+
+    const bedTime = mergeDateAndTime(bedDay, bedHour).replace(' ', 'T')
+    const wakeUpTime = mergeDateAndTime(wakeUpDay, wakeUpHour).replace(' ', 'T')
+
+    const payload: FormData = {
       id: 'nouvelID',
       title: 'nouveau titre',
-      bedTime: formData.bedTime.replace(' ', 'T'),
-      wakeUpTime: formData.wakeUpTime.replace(' ', 'T'),
-    })
-
-    const bedTimeToCheckFor = new Date(formData.bedTime)
-    if (bedTimeToCheckFor.getHours() >= 17) {
-      bedTimeToCheckFor.setDate(bedTimeToCheckFor.getDate() + 1)
+      bedTime,
+      wakeUpTime,
+      quality,
+      notes,
     }
-    const allready = checkForNite(
-      bedTimeToCheckFor.toLocaleString('sv-SE'),
-      nites
-    )
-    console.log(allready)
-  }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    })
-  }
+    const bedTimeToCheck = new Date(bedTime)
+    if (bedTimeToCheck.getHours() >= 17) {
+      bedTimeToCheck.setDate(bedTimeToCheck.getDate() + 1)
+    }
 
-  const handleQualityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      quality: Number(e.target.value),
-    }))
-  }
+    const already = checkForNite(bedTimeToCheck.toLocaleString('sv-SE'), nites)
 
-  console.log(formData.bedTime)
+    console.log(payload)
+    console.log('Déjà existant ?', already)
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 mt-6">
       <Carousel>
+        {/* COUCHER */}
         <fieldset className="w-full">
           <legend className="text-xl">Date du couché</legend>
           <div className="flex flex-col gap-6 items-center mt-10">
             <DatePicker
               selected={bedDay}
-              maxDate={new Date()}
-              onChange={(d: Date | null) => {
-                setBedDay(d)
-                setFormData({
-                  ...formData,
-                  bedTime: mergeDateAndTime(d, bedHour),
-                })
-              }}
+              maxDate={today}
+              onChange={(d: Date | null) => d && setBedDay(d)}
               dateFormat="dd/MM/yyyy"
-              className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
-              calendarClassName=""
               customInput={<CustomInput type="date" />}
-              name="date"
             />
             à
             <DatePicker
               selected={bedHour}
-              onChange={(d: Date | null) => {
-                setBedHour(d)
-                setFormData({
-                  ...formData,
-                  bedTime: mergeDateAndTime(bedDay, d),
-                })
-              }}
+              onChange={(d: Date | null) => d && setBedHour(d)}
               showTimeSelect
               showTimeSelectOnly
               timeIntervals={15}
               timeCaption="Heure"
-              timeFormat="HH:mm"
               dateFormat="HH:mm"
-              minTime={minBedHour}
-              maxTime={maxBedHour}
+              minTime={new Date(0, 0, 0, 0, 0)}
+              maxTime={
+                isSameDay(bedDay, today)
+                  ? new Date(0, 0, 0, 16, 45)
+                  : new Date(0, 0, 0, 23, 45)
+              }
               customInput={<CustomInput type="time" />}
-              className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
             />
           </div>
         </fieldset>
+
+        {/* RÉVEIL */}
         <fieldset className="w-full">
           <legend className="text-xl">Date du réveil</legend>
           <div className="flex flex-col gap-6 items-center mt-10">
@@ -291,183 +196,78 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               selected={wakeUpDay}
               minDate={minWakeUpDay}
               maxDate={maxWakeUpDay}
-              onChange={(d: Date | null) => {
-                if (!d) return
-                setWakeUpDay(d)
-                setFormData({
-                  ...formData,
-                  wakeUpTime: mergeDateAndTime(d, wakeUpHour),
-                })
-                toggleWakeUpHourBoundaries(d)
-              }}
+              onChange={(d: Date | null) => d && setWakeUpDay(d)}
               dateFormat="dd/MM/yyyy"
-              className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
-              calendarClassName="ml-50"
               customInput={<CustomInput type="date" />}
-              name="date"
             />
             à
             <DatePicker
               selected={wakeUpHour}
-              onChange={(d: Date | null) => {
-                setWakeUpHour(d)
-                setFormData({
-                  ...formData,
-                  wakeUpTime: mergeDateAndTime(wakeUpDay, d),
-                })
-              }}
+              onChange={(d: Date | null) => d && setWakeUpHour(d)}
               showTimeSelect
               showTimeSelectOnly
-              minTime={minWakeUpHour}
-              maxTime={maxWakeUpHour}
               timeIntervals={15}
               timeCaption="Heure"
-              timeFormat="HH:mm"
               dateFormat="HH:mm"
+              minTime={minWakeUpHour}
+              maxTime={maxWakeUpHour}
               customInput={<CustomInput type="time" />}
-              className="px-3 py-2 border-2 border-col2 rounded-lg bg-col1 font-bold decoration-underline"
             />
           </div>
         </fieldset>
+
+        {/* QUALITÉ */}
         <fieldset className="w-full">
           <legend className="text-xl">Bien Dormi ?</legend>
           <div className="flex justify-between mt-20">
-            <div
-              className={`active:translate-y-2 ${formData.quality !== 1 ? 'opacity-40' : ''}`}
-            >
-              <input
-                type="radio"
-                id="score1"
-                name="quality"
-                value={1}
-                onChange={handleQualityChange}
-                checked={formData.quality === 1}
-                className="relative h-10 w-10 z-20 opacity-0"
-              />
-              <br />
-              <img
-                src={scoreImages[0]}
-                alt="score"
-                className="relative bottom-12 right-1 z-10  "
-              />
-
-              <label htmlFor="score1" className="text-xs relative bottom-12">
-                nooon!
-              </label>
-            </div>
-            <div
-              className={`active:translate-y-2 ${formData.quality !== 2 ? 'opacity-40' : ''}`}
-            >
-              <input
-                type="radio"
-                id="score2"
-                name="quality"
-                value={2}
-                onChange={handleQualityChange}
-                checked={formData.quality === 2}
-                className="relative h-10 w-10 z-20 opacity-0"
-              />
-              <br />
-              <img
-                src={scoreImages[1]}
-                alt="score"
-                className="relative bottom-12 right-1 z-10  "
-              />
-
-              <label htmlFor="score2" className="text-xs relative bottom-12">
-                pas ouf
-              </label>
-            </div>
-
-            <div
-              className={`active:translate-y-2 ${formData.quality !== 3 ? 'opacity-40' : ''}`}
-            >
-              <input
-                type="radio"
-                id="score3"
-                name="quality"
-                value={3}
-                onChange={handleQualityChange}
-                checked={formData.quality === 3}
-                className="relative h-10 w-10 z-20 opacity-0"
-              />
-              <br />
-              <img
-                src={scoreImages[2]}
-                alt="score"
-                className="relative bottom-12 right-1 z-10  "
-              />
-
-              <label htmlFor="score3" className="text-xs relative bottom-12">
-                bof
-              </label>
-            </div>
-
-            <div
-              className={`active:translate-y-2 ${formData.quality !== 4 ? 'opacity-40' : ''}`}
-            >
-              <input
-                type="radio"
-                id="score4"
-                name="quality"
-                value={4}
-                onChange={handleQualityChange}
-                checked={formData.quality === 4}
-                className="relative h-10 w-10 z-20 opacity-0"
-              />
-              <br />
-              <img
-                src={scoreImages[3]}
-                alt="score"
-                className="relative bottom-12 right-1 z-10  "
-              />
-
-              <label htmlFor="score4" className="text-xs relative bottom-12">
-                ça va
-              </label>
-            </div>
-
-            <div
-              className={`active:translate-y-2 ${formData.quality !== 5 ? 'opacity-40' : ''}`}
-            >
-              <input
-                type="radio"
-                id="score5"
-                name="quality"
-                value={5}
-                onChange={handleQualityChange}
-                checked={formData.quality === 5}
-                className="relative h-10 w-10 z-20 opacity-0"
-              />
-              <br />
-              <img
-                src={scoreImages[4]}
-                alt="score"
-                className="relative bottom-12 right-1 z-10   "
-              />
-              <label className="text-xs relative bottom-12" htmlFor="score5">
-                au top!
-              </label>
-            </div>
+            {[1, 2, 3, 4, 5].map((score, i) => (
+              <div
+                key={score}
+                className={`active:translate-y-2 ${quality !== score ? 'opacity-40' : ''}`}
+              >
+                <input
+                  type="radio"
+                  id={`score${score}`}
+                  name="quality"
+                  value={score}
+                  onChange={(e) => setQuality(Number(e.target.value))}
+                  checked={quality === score}
+                  className="relative h-10 w-10 z-20 opacity-0"
+                />
+                <br />
+                <img
+                  src={scoreImages[i]}
+                  alt="score"
+                  className="relative bottom-12 right-1 z-10"
+                />
+                <label
+                  htmlFor={`score${score}`}
+                  className="text-xs relative bottom-12"
+                >
+                  {['nooon!', 'pas ouf', 'bof', 'ça va', 'au top!'][i]}
+                </label>
+              </div>
+            ))}
           </div>
         </fieldset>
+
+        {/* COMMENTAIRE */}
         <fieldset className="w-full">
           <legend className="text-xl">Commentaire et validation</legend>
+
           <input
             type="text"
-            className="bg-col1 w-full border-2 border-col2 rounded-lg p-2 mt-10 active:translate-y-2"
+            className="bg-col1 w-full border-2 border-col2 rounded-lg p-2 mt-10"
             placeholder="commentaire facultatif..."
             maxLength={150}
-            onChange={handleChange}
-            id="notes"
-            name="notes"
-            value={formData.notes}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
           />
+
           <div className="mx-auto mt-10 w-fit">
             <button
               type="submit"
-              className=" text-2xl font-bold bg-col1 border-2 border-col2 rounded-lg p-3 shadow-lg active:translate-y-2 active:shadow-none"
-              onSubmit={handleSubmit}
+              className="text-2xl font-bold bg-col1 border-2 border-col2 rounded-lg p-3 shadow-lg active:translate-y-2 active:shadow-none"
             >
               ENREGISTRER
             </button>
