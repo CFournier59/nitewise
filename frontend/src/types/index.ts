@@ -15,3 +15,5 @@ export type FormData = {
   quality: number
   notes: string
 }
+
+export type TimeField = 'bedTime' | 'wakeUpTime'

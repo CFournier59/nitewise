@@ -3,26 +3,19 @@ import Carousel from '../../components/Carousel'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import CustomInput from '../../components/CustomInput'
-import type { Nite, FormData } from '../../types'
+import type { Nite, FormData, TimeField } from '../../types'
 const modules = import.meta.glob('/src/assets/score*.svg', { eager: true })
 const scoreImages = Object.values(modules).map((m: any) => m.default)
+import { checkForNite } from '../../utils'
 
 export default function NiteForm({ nites }: { nites: Nite[] }) {
   // valeurs par défaut de la date de coucher
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
+  yesterday.setHours(22)
+  yesterday.setMinutes(0)
   const [bedDay, setBedDay] = useState<Date | null>(yesterday)
   const [bedHour, setBedHour] = useState<Date | null>(new Date(0, 0, 0, 22, 0))
-
-  // valeur par défaut du Formulaire
-  const [formData, setFormData] = useState<FormData>({
-    id: '',
-    title: '',
-    bedTime: yesterday.toLocaleString('sv-SE'),
-    wakeUpTime: '',
-    quality: 3,
-    notes: '',
-  })
 
   // valeur par défaut de la date de réveil
   const [wakeUpDay, setWakeUpDay] = useState<Date | null>(new Date())
@@ -39,8 +32,23 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
     new Date(0, 0, 0, 16, 45)
   )
 
+  const initialWakeUpTime = new Date()
+  initialWakeUpTime.setHours(7)
+  initialWakeUpTime.setMinutes(0)
+
+  // valeur par défaut du Formulaire
+  const [formData, setFormData] = useState<FormData>({
+    id: '',
+    title: '',
+    bedTime: yesterday.toLocaleString('sv-SE'),
+    wakeUpTime: initialWakeUpTime.toLocaleString('sv-SE'),
+    quality: 3,
+    notes: '',
+  })
+
   const isSameDay = (d1: Date, d2: Date) =>
-    d1.toISOString().slice(0, 10) === d2.toISOString().slice(0, 10)
+    d1.toLocaleString('sv-SE').slice(0, 10) ===
+    d2.toLocaleString('sv-SE').slice(0, 10)
 
   // calcul des limites d'heures de coucher
   const isBedDayToday = isSameDay(new Date(formData.bedTime), new Date())
@@ -64,32 +72,66 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
       isSameDay(new Date(formData.bedTime), new Date()) &&
       bedHour!.getHours() > 16
     ) {
-      setBedHour(new Date(0, 0, 0, 0, 0))
+      const newBedHour = new Date(0, 0, 0, 0, 0)
+      setBedHour(newBedHour)
+      setFormData((prev) => ({
+        ...prev,
+        bedTime: mergeDateAndTime(bedDay, newBedHour),
+      }))
       return
     }
     // si coucher et levé à aujourd'hui
     if (isSameDay(new Date(formData.bedTime), new Date())) {
-      setWakeUpDay(new Date())
+      const newWakeUpDay = new Date()
+      setWakeUpDay(newWakeUpDay)
+      setFormData((prev) => ({
+        ...prev,
+        wakeUpTime: mergeDateAndTime(newWakeUpDay, wakeUpHour),
+      }))
       setMinWakeUpDay(new Date())
       setMaxWakeUpDay(new Date())
-      setWakeUpHour(
-        new Date(0, 0, 0, bedHour!.getHours(), bedHour!.getMinutes() + 15)
+      const newWakeUpHour = new Date(
+        0,
+        0,
+        0,
+        bedHour!.getHours(),
+        bedHour!.getMinutes() + 15
       )
+      setWakeUpHour(newWakeUpHour)
+      setFormData((prev) => ({
+        ...prev,
+        wakeUpTime: mergeDateAndTime(wakeUpDay, newWakeUpHour),
+      }))
       setMinWakeUpHour(
         new Date(0, 0, 0, bedHour!.getHours(), bedHour!.getMinutes() + 15)
       )
       setMaxWakeUpHour(new Date(0, 0, 0, 16, 45))
-      console.log('limite haute 16:45')
       return
     }
     // si jour du couché différent du jour de levé et que :  heure du couché < 17
     if (bedHour!.getHours() < 17) {
-      setWakeUpDay(new Date(formData.bedTime))
+      const newWakeUpDay2 = new Date(formData.bedTime)
+      setWakeUpDay(newWakeUpDay2)
+      setFormData((prev) => ({
+        ...prev,
+        wakeUpTime: mergeDateAndTime(newWakeUpDay2, wakeUpHour),
+      }))
+
       setMinWakeUpDay(new Date(formData.bedTime))
       setMaxWakeUpDay(new Date(formData.bedTime))
-      setWakeUpHour(
-        new Date(0, 0, 0, bedHour!.getHours(), bedHour!.getMinutes() + 15)
+      const newWakeUpHour2 = new Date(
+        0,
+        0,
+        0,
+        bedHour!.getHours(),
+        bedHour!.getMinutes() + 15
       )
+      setWakeUpHour(newWakeUpHour2)
+      setFormData((prev) => ({
+        ...prev,
+        wakeUpTime: mergeDateAndTime(wakeUpDay, newWakeUpHour2),
+      }))
+
       setMinWakeUpHour(
         new Date(0, 0, 0, bedHour!.getHours(), bedHour!.getMinutes() + 15)
       )
@@ -97,15 +139,18 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
     } else {
       // si heure du couché > 17
       const bedDate: Date = new Date(formData.bedTime)
-      setWakeUpDay(
-        new Date(
-          bedDate.getFullYear(),
-          bedDate.getMonth(),
-          bedDate.getDate() + 1,
-          0,
-          0
-        )
+      const newWakeUpDay3 = new Date(
+        bedDate.getFullYear(),
+        bedDate.getMonth(),
+        bedDate.getDate() + 1,
+        0,
+        0
       )
+      setWakeUpDay(newWakeUpDay3)
+      setFormData((prev) => ({
+        ...prev,
+        wakeUpTime: mergeDateAndTime(newWakeUpDay3, wakeUpHour),
+      }))
       setMinWakeUpDay(new Date(formData.bedTime))
       setMaxWakeUpDay(
         new Date(
@@ -116,7 +161,12 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
           0
         )
       )
-      setWakeUpHour(new Date(0, 0, 0, 7, 0))
+      const newWakeUpHour3 = new Date(0, 0, 0, 7, 0)
+      setWakeUpHour(newWakeUpHour3)
+      setFormData((prev) => ({
+        ...prev,
+        wakeUpTime: mergeDateAndTime(wakeUpDay, newWakeUpHour3),
+      }))
       setMinWakeUpHour(new Date(0, 0, 0, 0, 0))
       setMaxWakeUpHour(new Date(0, 0, 0, 16, 45))
     }
@@ -153,25 +203,42 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    alert('Merci pour votre message, je vous répondrai dès que possible !')
+    console.log(formData.bedTime)
     setFormData({
-      id: '',
-      title: '',
-      bedTime: '',
-      wakeUpTime: '',
-      quality: 0,
-      notes: '',
+      ...formData,
+      id: 'nouvelID',
+      title: 'nouveau titre',
+      bedTime: formData.bedTime.replace(' ', 'T'),
+      wakeUpTime: formData.wakeUpTime.replace(' ', 'T'),
+    })
+
+    const bedTimeToCheckFor = new Date(formData.bedTime)
+    if (bedTimeToCheckFor.getHours() >= 17) {
+      bedTimeToCheckFor.setDate(bedTimeToCheckFor.getDate() + 1)
+    }
+    const allready = checkForNite(
+      bedTimeToCheckFor.toLocaleString('sv-SE'),
+      nites
+    )
+    console.log(allready)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     })
   }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
+  const handleQualityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
       quality: Number(e.target.value),
-    })
+    }))
   }
+
+  console.log(formData.bedTime)
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 mt-6">
       <Carousel>
@@ -271,9 +338,9 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               <input
                 type="radio"
                 id="score1"
-                name="score"
+                name="quality"
                 value={1}
-                onChange={handleChange}
+                onChange={handleQualityChange}
                 checked={formData.quality === 1}
                 className="relative h-10 w-10 z-20 opacity-0"
               />
@@ -294,9 +361,9 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               <input
                 type="radio"
                 id="score2"
-                name="score"
+                name="quality"
                 value={2}
-                onChange={handleChange}
+                onChange={handleQualityChange}
                 checked={formData.quality === 2}
                 className="relative h-10 w-10 z-20 opacity-0"
               />
@@ -318,9 +385,9 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               <input
                 type="radio"
                 id="score3"
-                name="score"
+                name="quality"
                 value={3}
-                onChange={handleChange}
+                onChange={handleQualityChange}
                 checked={formData.quality === 3}
                 className="relative h-10 w-10 z-20 opacity-0"
               />
@@ -342,9 +409,9 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               <input
                 type="radio"
                 id="score4"
-                name="score"
+                name="quality"
                 value={4}
-                onChange={handleChange}
+                onChange={handleQualityChange}
                 checked={formData.quality === 4}
                 className="relative h-10 w-10 z-20 opacity-0"
               />
@@ -366,9 +433,9 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               <input
                 type="radio"
                 id="score5"
-                name="score"
+                name="quality"
                 value={5}
-                onChange={handleChange}
+                onChange={handleQualityChange}
                 checked={formData.quality === 5}
                 className="relative h-10 w-10 z-20 opacity-0"
               />
@@ -378,7 +445,6 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
                 alt="score"
                 className="relative bottom-12 right-1 z-10   "
               />
-
               <label className="text-xs relative bottom-12" htmlFor="score5">
                 au top!
               </label>
@@ -392,6 +458,10 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
             className="bg-col1 w-full border-2 border-col2 rounded-lg p-2 mt-10 active:translate-y-2"
             placeholder="commentaire facultatif..."
             maxLength={150}
+            onChange={handleChange}
+            id="notes"
+            name="notes"
+            value={formData.notes}
           />
           <div className="mx-auto mt-10 w-fit">
             <button
