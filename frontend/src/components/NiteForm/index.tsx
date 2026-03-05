@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Navigate } from 'react-router'
 import Carousel from '../../components/Carousel'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -18,6 +19,8 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
   const today = new Date()
 
   // --- states atomiques ---
+  const [redirect, setRedirect] = useState(false)
+
   const [bedDay, setBedDay] = useState<Date>(yesterday)
   const [bedHour, setBedHour] = useState<Date>(new Date(0, 0, 0, 22, 0))
 
@@ -60,8 +63,8 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
 
     const bedIsToday = isSameDay(bedDay, today)
 
-    // 1) Si coucher aujourd’hui et heure > 16 → forcer 00:00
-    if (bedIsToday && bedHour.getHours() > 16) {
+    // 1) Si coucher aujourd’hui et heure > 17 → forcer 00:00
+    if (bedIsToday && bedHour.getHours() >= 17) {
       const newHour = new Date(0, 0, 0, 0, 0)
       setBedHour(newHour)
       return
@@ -143,19 +146,37 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
       notes,
     }
 
+    //vérifier que la nuit est valide
+    const diff =
+      new Date(payload.wakeUpTime).getTime() -
+      new Date(payload.bedTime).getTime()
+    if (diff < 0) {
+      alert(
+        '!!! Nuit non valide: date de réveil antérieure à la date de couché !!!'
+      )
+      return
+    }
     const bedTimeToCheck = new Date(bedTime)
     if (bedTimeToCheck.getHours() >= 17) {
       bedTimeToCheck.setDate(bedTimeToCheck.getDate() + 1)
     }
-
     const already = checkForNite(bedTimeToCheck.toLocaleString('sv-SE'), nites)
-
     console.log(payload)
     console.log('Déjà existant ?', already)
+    if (already) {
+      alert(
+        `!!! nuit non valide: une nuit est déjà enregistrée dans cette période: ${already.title} !!!`
+      )
+      return
+    }
+    alert('Nuit enregistrée avec succès!')
+    setRedirect(true)
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+      {redirect && <Navigate to="/nites" />}
+
       <Carousel>
         {/* COUCHER */}
         <fieldset className="w-full">
@@ -176,6 +197,7 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               showTimeSelectOnly
               timeIntervals={15}
               timeCaption="Heure"
+              timeFormat="HH:mm"
               dateFormat="HH:mm"
               minTime={new Date(0, 0, 0, 0, 0)}
               maxTime={
@@ -208,6 +230,7 @@ export default function NiteForm({ nites }: { nites: Nite[] }) {
               showTimeSelectOnly
               timeIntervals={15}
               timeCaption="Heure"
+              timeFormat="HH:mm"
               dateFormat="HH:mm"
               minTime={minWakeUpHour}
               maxTime={maxWakeUpHour}
