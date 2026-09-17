@@ -72,7 +72,6 @@ export function checkForNite(date: string, nites: Nite[]) {
   const highDate = new Date(date)
   highDate.setHours(16, 59, 59, 999)
   const highBoundary = highDate.toISOString()
-
   return nites.find(
     (nite) => nite.bedTime >= lowBoundary && nite.bedTime <= highBoundary
   )

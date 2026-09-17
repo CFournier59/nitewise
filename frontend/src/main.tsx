@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter, Routes, Route } from 'react-router'
 import './styles/tailwind.css'
@@ -18,19 +17,17 @@ async function init() {
 const nites: Nite[] = await init()
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<Home nites={nites} />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/login" element={<div>Login</div>} />
-        <Route path="/register" element={<div>Register</div>} />
-        <Route path="/stats" element={<div>Stats</div>} />
-        <Route path="/nites" element={<Show nites={nites} />} />
-        <Route path="/nites/create" element={<Create nites={nites} />} />
-        <Route path="/nites/:niteId" element={<div>Edit Nite</div>} />
-        <Route path="/*" element={<div>Not found</div>} />
-      </Routes>
-    </HashRouter>
-  </StrictMode>
+  <HashRouter>
+    <Routes>
+      <Route path="/" element={<Home nites={nites} />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/login" element={<div>Login</div>} />
+      <Route path="/register" element={<div>Register</div>} />
+      <Route path="/stats" element={<div>Stats</div>} />
+      <Route path="/nites" element={<Show nites={nites} />} />
+      <Route path="/nites/create" element={<Create nites={nites} />} />
+      <Route path="/nites/:niteId" element={<div>Edit Nite</div>} />
+      <Route path="/*" element={<div>Not found</div>} />
+    </Routes>
+  </HashRouter>
 )

@@ -8,6 +8,12 @@ export type Nite = {
 }
 
 export type FormData = {
-  time: string
-  date: string
+  id: string
+  title: string
+  bedTime: string
+  wakeUpTime: string
+  quality: number
+  notes: string
 }
+
+export type TimeField = 'bedTime' | 'wakeUpTime'
